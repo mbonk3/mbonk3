@@ -12,7 +12,7 @@
 
     :root {
       --gold: #f5c518;
-      --dark: #0d0d0d;
+      --dark: #0a0a0a;
       --card-bg: #1a1a1a;
       --card-back-bg: #141414;
       --border: #2e2e2e;
@@ -20,22 +20,212 @@
       --muted: #888;
     }
 
-    body {
+    html, body {
       font-family: 'Inter', sans-serif;
       background: var(--dark);
       color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
+      height: 100%;
+      overflow: hidden;
     }
 
-    /* ── Hero ── */
+    /* ═══════════════════════════════════
+       SAFE SCREEN
+    ═══════════════════════════════════ */
+    #safeScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 35%, #1c1204 0%, #060606 65%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 20;
+      transition: opacity 0.5s ease;
+    }
+
+    #safeScreen.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .safe-instruction {
+      font-size: 15px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .safe-instruction strong {
+      color: var(--gold);
+      font-size: 19px;
+    }
+
+    /* 3-D scene wrapper */
+    .safe-scene {
+      perspective: 1000px;
+    }
+
+    /* Outer safe body */
+    .safe-body {
+      position: relative;
+      width: min(280px, 82vw);
+      height: min(350px, 103vw);
+      background: linear-gradient(150deg, #2b2b2b 0%, #181818 100%);
+      border-radius: 18px;
+      border: 2px solid #3e3e3e;
+      box-shadow:
+        0 0 0 1px #2a2a2a,
+        0 28px 70px rgba(0,0,0,.9),
+        inset 0 1px 0 rgba(255,255,255,.06);
+      transform-origin: center center;
+      transition: transform 0.9s cubic-bezier(.4,0,.2,1), opacity 0.9s ease;
+    }
+
+    .safe-body.zoom {
+      transform: scale(20);
+      opacity: 0;
+    }
+
+    /* Interior (visible when door opens) */
+    .safe-interior {
+      position: absolute;
+      inset: 8px;
+      background: radial-gradient(ellipse at center, #1a1004 0%, #020202 70%);
+      border-radius: 12px;
+    }
+
+    /* Door */
+    .safe-door {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(150deg, #383838 0%, #1e1e1e 55%, #2e2e2e 100%);
+      border-radius: 16px;
+      border: 2px solid #4a4a4a;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      transition: transform 1.3s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .safe-door.open {
+      transform: perspective(1000px) rotateY(-148deg);
+    }
+
+    /* Corner bolts */
+    .bolt {
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #666 0%, #282828 100%);
+      border: 1px solid #555;
+    }
+    .bolt.tl { top: 13px;  left: 13px; }
+    .bolt.tr { top: 13px;  right: 13px; }
+    .bolt.bl { bottom: 13px; left: 13px; }
+    .bolt.br { bottom: 13px; right: 13px; }
+
+    /* Lock LED */
+    .lock-led {
+      position: absolute;
+      top: 16px;
+      right: 38px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #bb2222;
+      box-shadow: 0 0 7px rgba(187,34,34,.8);
+      transition: background .3s, box-shadow .3s;
+    }
+    .lock-led.unlocked {
+      background: #22cc66;
+      box-shadow: 0 0 12px rgba(34,204,102,.9);
+    }
+
+    /* Dial wrapper */
+    .dial-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dial-indicator {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left:  7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top:   11px solid var(--gold);
+      filter: drop-shadow(0 0 4px rgba(245,197,24,.7));
+      z-index: 2;
+    }
+
+    #dialCanvas {
+      display: block;
+      border-radius: 50%;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,.7));
+    }
+    #dialCanvas:active { cursor: grabbing; }
+
+    /* Handle */
+    .handle-bar {
+      width: 68px;
+      height: 15px;
+      background: linear-gradient(90deg, #555, #aaa 30%, #ccc 50%, #aaa 70%, #555);
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+
+    /* Number display */
+    .num-display {
+      font-size: 58px;
+      font-weight: 900;
+      font-family: 'Courier New', monospace;
+      color: #2e2e2e;
+      letter-spacing: -2px;
+      width: 110px;
+      text-align: center;
+      transition: color .25s, text-shadow .25s;
+    }
+    .num-display.active {
+      color: var(--gold);
+      text-shadow: 0 0 28px rgba(245,197,24,.5);
+    }
+
+    /* ═══════════════════════════════════
+       GIFT SCREEN
+    ═══════════════════════════════════ */
+    #giftScreen {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s ease;
+    }
+    #giftScreen.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Hero */
     .hero {
       position: relative;
       text-align: center;
       padding: 80px 24px 60px;
       overflow: hidden;
     }
-
     .hero::before {
       content: '';
       position: absolute;
@@ -43,7 +233,6 @@
       background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,197,24,.18) 0%, transparent 70%);
       pointer-events: none;
     }
-
     .age-badge {
       display: inline-block;
       font-size: clamp(80px, 18vw, 160px);
@@ -55,16 +244,13 @@
       background-clip: text;
       letter-spacing: -4px;
     }
-
     .hero h1 {
       font-size: clamp(24px, 5vw, 48px);
       font-weight: 700;
       margin: 8px 0 16px;
       letter-spacing: -0.5px;
     }
-
     .hero h1 span { color: var(--gold); }
-
     .hero p {
       color: var(--muted);
       font-size: 18px;
@@ -72,13 +258,12 @@
       margin: 0 auto;
     }
 
-    /* ── Section ── */
+    /* Section */
     .section {
       max-width: 960px;
       margin: 0 auto;
       padding: 0 24px 80px;
     }
-
     .section-title {
       text-align: center;
       font-size: 13px;
@@ -88,7 +273,6 @@
       color: var(--gold);
       margin-bottom: 12px;
     }
-
     .section-hint {
       text-align: center;
       font-size: 13px;
@@ -96,30 +280,25 @@
       margin-bottom: 40px;
     }
 
-    /* ── Flip Cards ── */
+    /* Flip cards */
     .cards {
       display: grid;
       gap: 24px;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
-
     .flip-card {
       perspective: 1200px;
       height: 400px;
       cursor: pointer;
     }
-
     .flip-card-inner {
       position: relative;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      transition: transform .6s cubic-bezier(.4, 0, .2, 1);
+      transition: transform .6s cubic-bezier(.4,0,.2,1);
     }
-
-    .flip-card.flipped .flip-card-inner {
-      transform: rotateY(180deg);
-    }
+    .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
 
     .flip-card-front,
     .flip-card-back {
@@ -132,13 +311,11 @@
       overflow: hidden;
       transition: border-color .25s, box-shadow .25s;
     }
-
     .flip-card-front {
       background: var(--card-bg);
       display: flex;
       flex-direction: column;
     }
-
     .flip-card-back {
       background: var(--card-back-bg);
       transform: rotateY(180deg);
@@ -148,25 +325,19 @@
       padding: 36px 32px;
       border-color: var(--gold);
     }
-
     .flip-card:hover .flip-card-front,
     .flip-card:hover .flip-card-back {
       border-color: var(--gold);
       box-shadow: 0 12px 40px rgba(245,197,24,.15);
     }
 
-    /* Front */
     .card-icon {
       font-size: 72px;
       text-align: center;
       padding: 40px 24px 20px;
       background: linear-gradient(180deg, rgba(245,197,24,.07) 0%, transparent 100%);
     }
-
-    .card-body {
-      padding: 0 28px 32px;
-    }
-
+    .card-body { padding: 0 28px 32px; }
     .card-label {
       font-size: 11px;
       font-weight: 700;
@@ -175,20 +346,13 @@
       color: var(--gold);
       margin-bottom: 8px;
     }
-
     .card-title {
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 12px;
       letter-spacing: -0.3px;
     }
-
-    .card-desc {
-      font-size: 15px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
+    .card-desc { font-size: 15px; color: var(--muted); line-height: 1.6; }
     .card-tag {
       display: inline-block;
       margin-top: 20px;
@@ -199,7 +363,6 @@
       font-weight: 600;
       color: var(--muted);
     }
-
     .flip-hint {
       margin-top: auto;
       padding: 14px 28px;
@@ -211,12 +374,7 @@
       border-top: 1px solid var(--border);
     }
 
-    .flip-hint svg {
-      opacity: .5;
-      flex-shrink: 0;
-    }
-
-    /* Back */
+    /* Card back */
     .back-label {
       font-size: 11px;
       font-weight: 700;
@@ -225,21 +383,18 @@
       color: var(--gold);
       margin-bottom: 16px;
     }
-
     .back-title {
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 20px;
       letter-spacing: -0.3px;
     }
-
     .back-details {
       list-style: none;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-
     .back-details li {
       display: flex;
       gap: 12px;
@@ -248,20 +403,13 @@
       color: var(--muted);
       line-height: 1.5;
     }
-
-    .back-details li .di {
-      font-size: 18px;
-      flex-shrink: 0;
-      margin-top: -1px;
-    }
-
+    .back-details li .di { font-size: 18px; flex-shrink: 0; margin-top: -1px; }
     .back-details li strong {
       color: var(--text);
       display: block;
       font-size: 13px;
       margin-bottom: 2px;
     }
-
     .back-close {
       margin-top: 28px;
       font-size: 12px;
@@ -270,7 +418,7 @@
       text-align: center;
     }
 
-    /* ── Footer ── */
+    /* Footer */
     footer {
       text-align: center;
       padding: 40px 24px;
@@ -278,15 +426,13 @@
       font-size: 14px;
       border-top: 1px solid var(--border);
     }
-
     footer strong { color: var(--gold); }
 
-    /* ── Confetti ── */
+    /* Confetti */
     @keyframes float {
-      0%   { transform: translateY(0)   rotate(0deg);   opacity: 1; }
+      0%   { transform: translateY(0) rotate(0deg);     opacity: 1; }
       100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
     }
-
     .confetti-wrap {
       position: fixed;
       bottom: 0; left: 0; right: 0;
@@ -295,13 +441,7 @@
       justify-content: center;
       gap: 16px;
     }
-
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      animation: float 2.5s ease-out infinite;
-    }
-
+    .dot { width: 10px; height: 10px; border-radius: 50%; animation: float 2.5s ease-out infinite; }
     .dot:nth-child(1) { background:#f5c518; animation-delay:0s;    animation-duration:2.8s; }
     .dot:nth-child(2) { background:#ff6b6b; animation-delay:.4s;   animation-duration:2.3s; }
     .dot:nth-child(3) { background:#4ecdc4; animation-delay:.8s;   animation-duration:3.1s; }
@@ -313,32 +453,55 @@
 </head>
 <body>
 
-  <!-- Hero -->
+<!-- ═══════════════ SAFE SCREEN ═══════════════ -->
+<div id="safeScreen">
+  <p class="safe-instruction">Dreh das Rad auf <strong>27</strong></p>
+
+  <div class="safe-scene">
+    <div class="safe-body" id="safeBody">
+      <div class="safe-interior"></div>
+      <div class="safe-door" id="safeDoor">
+        <div class="bolt tl"></div>
+        <div class="bolt tr"></div>
+        <div class="bolt bl"></div>
+        <div class="bolt br"></div>
+        <div class="lock-led" id="lockLed"></div>
+
+        <div class="dial-area">
+          <div class="dial-indicator"></div>
+          <canvas id="dialCanvas" width="158" height="158"></canvas>
+        </div>
+
+        <div class="handle-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="num-display" id="numDisplay">–</div>
+</div>
+
+<!-- ═══════════════ GIFT SCREEN ═══════════════ -->
+<div id="giftScreen">
   <div class="hero">
     <div class="age-badge">27</div>
     <h1>Alles Gute, <span>Mathes</span>!</h1>
     <p>Ein besonderer Geburtstag verdient ein besonderes Geschenk. Such dir eines aus:</p>
   </div>
 
-  <!-- Gift Options -->
   <section class="section">
     <p class="section-title">Dein Geschenk</p>
     <p class="section-hint">Kachel antippen für Details</p>
-
     <div class="cards">
 
       <!-- Card 1: Padel -->
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
-
           <div class="flip-card-front">
             <div class="card-icon">🎾</div>
             <div class="card-body">
               <div class="card-label">Option 1</div>
               <div class="card-title">Couple Padel</div>
-              <div class="card-desc">
-                Ein gemeinsames Padel-Abenteuer – auf dem Court, als Team. Schläger schwingt sich besser zu zweit.
-              </div>
+              <div class="card-desc">Ein gemeinsames Padel-Abenteuer – auf dem Court, als Team. Schläger schwingt sich besser zu zweit.</div>
               <div class="card-tag">Sport &amp; Spaß</div>
             </div>
             <div class="flip-hint">
@@ -346,7 +509,6 @@
               Antippen für Details
             </div>
           </div>
-
           <div class="flip-card-back">
             <div class="back-label">Option 1</div>
             <div class="back-title">Couple Padel 🎾</div>
@@ -354,15 +516,15 @@
               <li>
                 <span class="di">📍</span>
                 <div>
-                  <strong>Padel FC – Berlin</strong>
-                  Köpenicker Chaussee 11–14, 10317 Berlin (bei Ostkreuz) – Berlins erstes Indoor-Padel-Club, gegründet von Marc Klopp
+                  <strong>PadelCity – Berlin Mitte</strong>
+                  Emma-Herwegh-Straße, 10557 Berlin – direkt am Berliner Hauptbahnhof, unter dem Viadukt
                 </div>
               </li>
               <li>
                 <span class="di">🕐</span>
                 <div>
                   <strong>Wann?</strong>
-                  Termin nach Absprache – täglich 08:00–23:00 Uhr geöffnet
+                  Termin nach Absprache – Courts direkt unter den Bahngleisen
                 </div>
               </li>
               <li>
@@ -375,22 +537,18 @@
             </ul>
             <div class="back-close">Nochmal tippen zum Zuklappen</div>
           </div>
-
         </div>
       </div>
 
       <!-- Card 2: DTM -->
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
-
           <div class="flip-card-front">
             <div class="card-icon">🏎️</div>
             <div class="card-body">
               <div class="card-label">Option 2</div>
               <div class="card-title">DTM – Oschersleben</div>
-              <div class="card-desc">
-                Live dabei, wenn die Tourenwagen auf der Motorsport Arena Oschersleben auf Vollgas gehen. Benzin in der Luft inklusive.
-              </div>
+              <div class="card-desc">Live dabei, wenn die Tourenwagen auf der Motorsport Arena Oschersleben auf Vollgas gehen. Benzin in der Luft inklusive.</div>
               <div class="card-tag">Motorsport</div>
             </div>
             <div class="flip-hint">
@@ -398,17 +556,13 @@
               Antippen für Details
             </div>
           </div>
-
           <div class="flip-card-back">
             <div class="back-label">Option 2</div>
             <div class="back-title">DTM Oschersleben 🏎️</div>
             <ul class="back-details">
               <li>
                 <span class="di">📅</span>
-                <div>
-                  <strong>Datum</strong>
-                  24. – 26. Juli 2026
-                </div>
+                <div><strong>Datum</strong>24. – 26. Juli 2026</div>
               </li>
               <li>
                 <span class="di">📍</span>
@@ -421,28 +575,24 @@
                 <span class="di">🏁</span>
                 <div>
                   <strong>Was dich erwartet</strong>
-                  Zwei Rennen, Vollgas-Action im Tourenwagen-Spektakel und Atmosphäre direkt an der Strecke
+                  Zwei Rennen, Vollgas-Action im Tourenwagen-Spektakel direkt an der Strecke
                 </div>
               </li>
             </ul>
             <div class="back-close">Nochmal tippen zum Zuklappen</div>
           </div>
-
         </div>
       </div>
 
       <!-- Card 3: MotoGP -->
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
-
           <div class="flip-card-front">
             <div class="card-icon">🏍️</div>
             <div class="card-body">
               <div class="card-label">Option 3</div>
               <div class="card-title">MotoGP – Sachsenring</div>
-              <div class="card-desc">
-                Der Grand Prix von Deutschland auf einer der wildesten Strecken der Welt. Kurven, Speed und Weltklasse-Fahrer hautnah.
-              </div>
+              <div class="card-desc">Der Grand Prix von Deutschland auf einer der wildesten Strecken der Welt. Kurven, Speed und Weltklasse-Fahrer hautnah.</div>
               <div class="card-tag">Motorsport</div>
             </div>
             <div class="flip-hint">
@@ -450,57 +600,216 @@
               Antippen für Details
             </div>
           </div>
-
           <div class="flip-card-back">
             <div class="back-label">Option 3</div>
             <div class="back-title">MotoGP Sachsenring 🏍️</div>
             <ul class="back-details">
               <li>
                 <span class="di">📅</span>
-                <div>
-                  <strong>Datum</strong>
-                  10. – 12. Juli 2026
-                </div>
+                <div><strong>Datum</strong>10. – 12. Juli 2026</div>
               </li>
               <li>
                 <span class="di">📍</span>
                 <div>
                   <strong>Strecke</strong>
-                  Sachsenring, Hohenstein-Ernstthal – Heimstrecke des Deutschen Grand Prix mit legendären Linkskurven
+                  Sachsenring, Hohenstein-Ernstthal – legendäre Linkskurven, Heimstrecke des Deutschen Grand Prix
                 </div>
               </li>
               <li>
                 <span class="di">🏁</span>
                 <div>
                   <strong>Was dich erwartet</strong>
-                  Weltklasse-Piloten auf 1000cc-Maschinen – der schnellste Motorsport der Welt live erleben
+                  Weltklasse-Piloten auf 1000cc-Maschinen – der schnellste Motorsport der Welt live
                 </div>
               </li>
             </ul>
             <div class="back-close">Nochmal tippen zum Zuklappen</div>
           </div>
-
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer>
-    Made with <strong>❤️</strong> für <strong>Mathes</strong> zum 27. Geburtstag
-  </footer>
+  <footer>Made with <strong>❤️</strong> für <strong>Mathes</strong> zum 27. Geburtstag</footer>
 
-  <!-- Floating confetti dots -->
   <div class="confetti-wrap">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     <div class="dot"></div>
   </div>
+</div>
 
+<script>
+  /* ── Draw dial on canvas (static; CSS rotation spins it) ── */
+  const canvas  = document.getElementById('dialCanvas');
+  const ctx     = canvas.getContext('2d');
+  const TICKS   = 40;
+  const W = canvas.width, H = canvas.height;
+  const CX = W / 2, CY = H / 2, R = W / 2 - 2;
+
+  (function drawDial() {
+    // Outer bezel
+    const bezel = ctx.createRadialGradient(CX - 10, CY - 10, 6, CX, CY, R);
+    bezel.addColorStop(0,   '#5a5a5a');
+    bezel.addColorStop(0.6, '#3a3a3a');
+    bezel.addColorStop(1,   '#1e1e1e');
+    ctx.beginPath();
+    ctx.arc(CX, CY, R, 0, Math.PI * 2);
+    ctx.fillStyle = bezel;
+    ctx.fill();
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Ticks + numbers
+    for (let i = 0; i < TICKS; i++) {
+      const a       = (i / TICKS) * Math.PI * 2 - Math.PI / 2;
+      const major   = i % 5 === 0;
+      const tickLen = major ? 13 : 6;
+      const outerR  = R - 4;
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(a) * (outerR - tickLen), CY + Math.sin(a) * (outerR - tickLen));
+      ctx.lineTo(CX + Math.cos(a) * outerR,             CY + Math.sin(a) * outerR);
+      ctx.strokeStyle = major ? '#bbb' : '#555';
+      ctx.lineWidth   = major ? 2 : 1;
+      ctx.stroke();
+
+      if (major) {
+        const nr = R - 25;
+        ctx.save();
+        ctx.translate(CX + Math.cos(a) * nr, CY + Math.sin(a) * nr);
+        ctx.rotate(a + Math.PI / 2);
+        ctx.fillStyle = '#ccc';
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(i), 0, 0);
+        ctx.restore();
+      }
+    }
+
+    // Inner disc
+    const innerR = R - 20;
+    const disc   = ctx.createRadialGradient(CX - 8, CY - 8, 4, CX, CY, innerR);
+    disc.addColorStop(0, '#4a4a4a');
+    disc.addColorStop(1, '#1a1a1a');
+    ctx.beginPath();
+    ctx.arc(CX, CY, innerR, 0, Math.PI * 2);
+    ctx.fillStyle = disc;
+    ctx.fill();
+
+    // Grip lines
+    for (let i = 0; i < 20; i++) {
+      const a = (i / 20) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(a) * 18,          CY + Math.sin(a) * 18);
+      ctx.lineTo(CX + Math.cos(a) * (innerR - 2), CY + Math.sin(a) * (innerR - 2));
+      ctx.strokeStyle = 'rgba(255,255,255,.04)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    // Centre knob
+    const knob = ctx.createRadialGradient(CX - 3, CY - 3, 2, CX, CY, 13);
+    knob.addColorStop(0, '#888');
+    knob.addColorStop(1, '#2a2a2a');
+    ctx.beginPath();
+    ctx.arc(CX, CY, 13, 0, Math.PI * 2);
+    ctx.fillStyle = knob;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(CX, CY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+  })();
+
+  /* ── Dial interaction ── */
+  let totalRot  = 0;   // accumulated CSS rotation in degrees
+  let dragging  = false;
+  let lastAngle = 0;
+  let unlocked  = false;
+
+  const numDisplay = document.getElementById('numDisplay');
+  const lockLed    = document.getElementById('lockLed');
+  const safeDoor   = document.getElementById('safeDoor');
+  const safeBody   = document.getElementById('safeBody');
+  const safeScreen = document.getElementById('safeScreen');
+  const giftScreen = document.getElementById('giftScreen');
+
+  function ptrAngle(e) {
+    const r  = canvas.getBoundingClientRect();
+    const px = e.touches ? e.touches[0].clientX : e.clientX;
+    const py = e.touches ? e.touches[0].clientY : e.clientY;
+    return Math.atan2(py - (r.top + r.height / 2), px - (r.left + r.width / 2)) * (180 / Math.PI);
+  }
+
+  // Number at indicator: counterclockwise drag = numbers increase
+  function currentNum() {
+    const step = 360 / TICKS;
+    return Math.round(((-totalRot / step) % TICKS + TICKS) % TICKS) % TICKS;
+  }
+
+  canvas.addEventListener('mousedown',  e => { if (unlocked) return; dragging = true;  lastAngle = ptrAngle(e); });
+  canvas.addEventListener('touchstart', e => { if (unlocked) return; dragging = true;  lastAngle = ptrAngle(e); e.preventDefault(); }, { passive: false });
+
+  window.addEventListener('mousemove',  onMove);
+  window.addEventListener('touchmove',  e => onMove(e, true), { passive: false });
+  window.addEventListener('mouseup',    () => { dragging = false; });
+  window.addEventListener('touchend',   () => { dragging = false; });
+
+  function onMove(e, isTouch) {
+    if (!dragging || unlocked) return;
+    if (isTouch) e.preventDefault();
+    const a     = ptrAngle(e);
+    let   delta = a - lastAngle;
+    if (delta >  180) delta -= 360;
+    if (delta < -180) delta += 360;
+    totalRot  += delta;
+    lastAngle  = a;
+    canvas.style.transform = `rotate(${totalRot}deg)`;
+
+    const n = currentNum();
+    numDisplay.textContent = String(n).padStart(2, '0');
+    numDisplay.classList.toggle('active', n === 27);
+    if (n === 27) triggerUnlock();
+  }
+
+  /* ── Unlock sequence ── */
+  function triggerUnlock() {
+    if (unlocked) return;
+    unlocked = true;
+
+    // Snap dial to exact 27 position
+    const step    = 360 / TICKS;
+    const base    = -27 * step;
+    const k       = Math.round((totalRot - base) / 360);
+    const snapped = base + k * 360;
+    canvas.style.transition = 'transform 0.25s ease';
+    canvas.style.transform  = `rotate(${snapped}deg)`;
+
+    lockLed.classList.add('unlocked');
+    numDisplay.textContent = '27';
+    numDisplay.classList.add('active');
+
+    // Open door
+    setTimeout(() => {
+      safeDoor.classList.add('open');
+
+      // Zoom into safe interior
+      setTimeout(() => {
+        safeBody.classList.add('zoom');
+
+        // Switch to gift screen
+        setTimeout(() => {
+          safeScreen.style.display = 'none';
+          document.body.style.overflow = 'auto';
+          document.body.style.height   = 'auto';
+          giftScreen.classList.add('visible');
+        }, 650);
+      }, 1500);
+    }, 450);
+  }
+</script>
 </body>
 </html>
