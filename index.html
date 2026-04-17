@@ -14,6 +14,7 @@
       --gold: #f5c518;
       --dark: #0d0d0d;
       --card-bg: #1a1a1a;
+      --card-back-bg: #141414;
       --border: #2e2e2e;
       --text: #f0f0f0;
       --muted: #888;
@@ -85,31 +86,76 @@
       letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .section-hint {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
       margin-bottom: 40px;
     }
 
-    /* ── Cards ── */
+    /* ── Flip Cards ── */
     .cards {
       display: grid;
       gap: 24px;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      transition: transform .25s, border-color .25s, box-shadow .25s;
-      cursor: default;
+    .flip-card {
+      perspective: 1200px;
+      height: 400px;
+      cursor: pointer;
     }
 
-    .card:hover {
-      transform: translateY(-6px);
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .6s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      transition: border-color .25s, box-shadow .25s;
+    }
+
+    .flip-card-front {
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flip-card-back {
+      background: var(--card-back-bg);
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 36px 32px;
+      border-color: var(--gold);
+    }
+
+    .flip-card:hover .flip-card-front,
+    .flip-card:hover .flip-card-back {
       border-color: var(--gold);
       box-shadow: 0 12px 40px rgba(245,197,24,.15);
     }
 
+    /* Front */
     .card-icon {
       font-size: 72px;
       text-align: center;
@@ -154,6 +200,76 @@
       color: var(--muted);
     }
 
+    .flip-hint {
+      margin-top: auto;
+      padding: 14px 28px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    .flip-hint svg {
+      opacity: .5;
+      flex-shrink: 0;
+    }
+
+    /* Back */
+    .back-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .back-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    .back-details {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .back-details li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .back-details li .di {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: -1px;
+    }
+
+    .back-details li strong {
+      color: var(--text);
+      display: block;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .back-close {
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: .6;
+      text-align: center;
+    }
+
     /* ── Footer ── */
     footer {
       text-align: center;
@@ -165,7 +281,7 @@
 
     footer strong { color: var(--gold); }
 
-    /* ── Confetti pop (CSS only) ── */
+    /* ── Confetti ── */
     @keyframes float {
       0%   { transform: translateY(0)   rotate(0deg);   opacity: 1; }
       100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
@@ -207,42 +323,163 @@
   <!-- Gift Options -->
   <section class="section">
     <p class="section-title">Dein Geschenk</p>
+    <p class="section-hint">Kachel antippen für Details</p>
 
     <div class="cards">
 
-      <div class="card">
-        <div class="card-icon">🎾</div>
-        <div class="card-body">
-          <div class="card-label">Option 1</div>
-          <div class="card-title">Couple Padel</div>
-          <div class="card-desc">
-            Ein gemeinsames Padel-Abenteuer – auf dem Court, als Team. Schläger schwingt sich besser zu zweit.
+      <!-- Card 1: Padel -->
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+
+          <div class="flip-card-front">
+            <div class="card-icon">🎾</div>
+            <div class="card-body">
+              <div class="card-label">Option 1</div>
+              <div class="card-title">Couple Padel</div>
+              <div class="card-desc">
+                Ein gemeinsames Padel-Abenteuer – auf dem Court, als Team. Schläger schwingt sich besser zu zweit.
+              </div>
+              <div class="card-tag">Sport &amp; Spaß</div>
+            </div>
+            <div class="flip-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+              Antippen für Details
+            </div>
           </div>
-          <div class="card-tag">Sport &amp; Spaß</div>
+
+          <div class="flip-card-back">
+            <div class="back-label">Option 1</div>
+            <div class="back-title">Couple Padel 🎾</div>
+            <ul class="back-details">
+              <li>
+                <span class="di">📍</span>
+                <div>
+                  <strong>Padel FC – Berlin</strong>
+                  Köpenicker Chaussee 11–14, 10317 Berlin (bei Ostkreuz) – Berlins erstes Indoor-Padel-Club, gegründet von Marc Klopp
+                </div>
+              </li>
+              <li>
+                <span class="di">🕐</span>
+                <div>
+                  <strong>Wann?</strong>
+                  Termin nach Absprache – täglich 08:00–23:00 Uhr geöffnet
+                </div>
+              </li>
+              <li>
+                <span class="di">🍽️</span>
+                <div>
+                  <strong>Danach</strong>
+                  Gemeinsames Essen – der perfekte Abschluss nach dem Match
+                </div>
+              </li>
+            </ul>
+            <div class="back-close">Nochmal tippen zum Zuklappen</div>
+          </div>
+
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-icon">🏎️</div>
-        <div class="card-body">
-          <div class="card-label">Option 2</div>
-          <div class="card-title">DTM Rennen – Oschersleben</div>
-          <div class="card-desc">
-            Live dabei, wenn die Tourenwagen auf dem Motorsport Arena Oschersleben auf Vollgas gehen. Benzin in der Luft inklusive.
+      <!-- Card 2: DTM -->
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+
+          <div class="flip-card-front">
+            <div class="card-icon">🏎️</div>
+            <div class="card-body">
+              <div class="card-label">Option 2</div>
+              <div class="card-title">DTM – Oschersleben</div>
+              <div class="card-desc">
+                Live dabei, wenn die Tourenwagen auf der Motorsport Arena Oschersleben auf Vollgas gehen. Benzin in der Luft inklusive.
+              </div>
+              <div class="card-tag">Motorsport</div>
+            </div>
+            <div class="flip-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+              Antippen für Details
+            </div>
           </div>
-          <div class="card-tag">Motorsport</div>
+
+          <div class="flip-card-back">
+            <div class="back-label">Option 2</div>
+            <div class="back-title">DTM Oschersleben 🏎️</div>
+            <ul class="back-details">
+              <li>
+                <span class="di">📅</span>
+                <div>
+                  <strong>Datum</strong>
+                  24. – 26. Juli 2026
+                </div>
+              </li>
+              <li>
+                <span class="di">📍</span>
+                <div>
+                  <strong>Strecke</strong>
+                  Motorsport Arena Oschersleben – eine der technisch anspruchsvollsten Strecken Deutschlands
+                </div>
+              </li>
+              <li>
+                <span class="di">🏁</span>
+                <div>
+                  <strong>Was dich erwartet</strong>
+                  Zwei Rennen, Vollgas-Action im Tourenwagen-Spektakel und Atmosphäre direkt an der Strecke
+                </div>
+              </li>
+            </ul>
+            <div class="back-close">Nochmal tippen zum Zuklappen</div>
+          </div>
+
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-icon">🏍️</div>
-        <div class="card-body">
-          <div class="card-label">Option 3</div>
-          <div class="card-title">MotoGP – Sachsenring</div>
-          <div class="card-desc">
-            Der Grand Prix von Deutschland auf einer der wildesten Strecken der Welt. Kurven, Speed und Weltklasse-Fahrer hautnah.
+      <!-- Card 3: MotoGP -->
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+
+          <div class="flip-card-front">
+            <div class="card-icon">🏍️</div>
+            <div class="card-body">
+              <div class="card-label">Option 3</div>
+              <div class="card-title">MotoGP – Sachsenring</div>
+              <div class="card-desc">
+                Der Grand Prix von Deutschland auf einer der wildesten Strecken der Welt. Kurven, Speed und Weltklasse-Fahrer hautnah.
+              </div>
+              <div class="card-tag">Motorsport</div>
+            </div>
+            <div class="flip-hint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+              Antippen für Details
+            </div>
           </div>
-          <div class="card-tag">Motorsport</div>
+
+          <div class="flip-card-back">
+            <div class="back-label">Option 3</div>
+            <div class="back-title">MotoGP Sachsenring 🏍️</div>
+            <ul class="back-details">
+              <li>
+                <span class="di">📅</span>
+                <div>
+                  <strong>Datum</strong>
+                  10. – 12. Juli 2026
+                </div>
+              </li>
+              <li>
+                <span class="di">📍</span>
+                <div>
+                  <strong>Strecke</strong>
+                  Sachsenring, Hohenstein-Ernstthal – Heimstrecke des Deutschen Grand Prix mit legendären Linkskurven
+                </div>
+              </li>
+              <li>
+                <span class="di">🏁</span>
+                <div>
+                  <strong>Was dich erwartet</strong>
+                  Weltklasse-Piloten auf 1000cc-Maschinen – der schnellste Motorsport der Welt live erleben
+                </div>
+              </li>
+            </ul>
+            <div class="back-close">Nochmal tippen zum Zuklappen</div>
+          </div>
+
         </div>
       </div>
 
